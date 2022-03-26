@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const allItemSchema = require('../../schemas/allItemSchema')
 const AllItem = new mongoose.model('AllItem', allItemSchema)
 
+
 //Get All the Items
 router.get('/',(req,res)=>{
     AllItem.find({isStatus: 'active'})
@@ -20,7 +21,7 @@ router.get('/',(req,res)=>{
         })
 })
 
-//Get A Particular Item
+//Get A Particular Item by id
 router.get('/:id',(req,res)=>{
     const id = req.params.id
     AllItem.findById(id)
