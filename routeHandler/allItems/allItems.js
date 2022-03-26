@@ -68,24 +68,32 @@ router.post('/all',async(req,res)=>{
     })
 })
 
-//Put An Item
-router.put('/:id',async(req,res)=>{
-    await AllItem.updateOne({_id:req.params.id},{
+//Patch An Item
+router.patch('/:id',(req,res)=>{
+    const id = req.params.id
+    AllItem.updateOne({id:id},{
         $set:{
-            isStatus: 'active',
-            
-        }
-    },(err)=>{
-        if(err){
-            res.status(500).json({
-                error:"There was Server Side error"
-            })            
-        } else {
-            res.status(200).json({
-                message:"Item was edited Successfully"
-            })
+            categoryType: req.body.categoryType,
+            itemName: req.body.itemName,
+            itemPrice:req.body.itemPrice,
+            itemImage:req.body.itemImage,
+            itemDescription:req.body.itemDescription,
+            isStatus:req.body.isStatus,
+            discountPercentage:req.body.discountPercentage
         }
     })
+    .exec()
+    .then(result =>{
+        console.log(result)
+        res.status(200).json()
+    })
+    .catch(err =>{
+        console.log(err)
+        res.status(500).json({
+            error:err
+        })
+    })
+
 })
 
 //Delete An Item
