@@ -1,3 +1,4 @@
+const { response } = require('express')
 const express = require('express')
 const router = express.Router()
 const mongoose = require("mongoose")
@@ -6,52 +7,84 @@ const AllItem = new mongoose.model('AllItem', allItemSchema)
 
 
 //Get All the Items
-router.get('/',(req,res)=>{
-    AllItem.find({isStatus: 'active'})
-        .exec()
-        .then(docs =>{
-            console.log(docs)
-            res.status(200).json(docs)
+router.get('/',async (req,res)=>{
+    try{
+        const data = await AllItem.find({isStatus: 'active'})
+        res.status(200).json({
+            result: data,
+            message:"Success"
         })
-        .catch(err=>{
-            console.log(err)
-            res.status(500).json({
-                error: err
-            })
+    }catch(err){
+        res.status(500).json({
+            error:"There was a server side error"
         })
+    }
+    // AllItem.find({isStatus: 'active'})
+    //     .exec()
+    //     .then(docs =>{
+    //         console.log(docs)
+    //         res.status(200).json(docs)
+    //     })
+    //     .catch(err=>{
+    //         console.log(err)
+    //         res.status(500).json({
+    //             error: err
+    //         })
+    //     })
 })
 
 //Get A Particular Item by id
-router.get('/:id',(req,res)=>{
+router.get('/:id',async(req,res)=>{
     const id = req.params.id
-    AllItem.findById(id)
-        .exec()
-        .then(docs =>{
-            console.log(docs)
-            res.status(200).json(docs)
-        })
-        .catch(err=>{
-            console.log(err)
-            res.status(500).json({
-                error: err
+    try{
+        const data = await AllItem.findById(id)
+            res.status(200).json({
+            result: data,
+            message:"Success"
             })
+    }catch(err){
+        res.status(500).json({
+            error:"There was a server side error"
         })
+    }
+        // .exec()
+        // .then(docs =>{
+        //     console.log(docs)
+        //     res.status(200).json(docs)
+        // })
+        // .catch(err=>{
+        //     console.log(err)
+        //     res.status(500).json({
+        //         error: err
+        //     })
+        // })
 })
 
 //Post An Item
 router.post("/",async(req,res)=>{
-    const newitem = new AllItem(req.body)
-    await newitem.save((err)=>{
-        if(err){
-            res.status(500).json({
-                error:"There was a Server Side Error"
+    // const newitem = new AllItem(req.body)
+    // await newitem.save((err)=>{
+    //     if(err){
+    //         res.status(500).json({
+    //             error:"There was a Server Side Error"
+    //         })
+    //     } else {
+    //         res.status(200).json({
+    //             message:"Item was inserted Successfully"
+    //         })            
+    //     }
+    // })
+    try{
+        const data = await AllItem(req.body).save()
+        res.status(200).json({
+            result: data,
+            message:"Success"
             })
-        } else {
-            res.status(200).json({
-                message:"Item was inserted Successfully"
-            })            
-        }
-    })
+    }catch(err){
+        res.status(500).json({
+            error:"There was a server side error"
+        })        
+    }
 })
 
 //Post Multiple Item
