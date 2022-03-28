@@ -1,13 +1,12 @@
-const { response } = require('express')
 const express = require('express')
 const router = express.Router()
 const mongoose = require("mongoose")
 const allItemSchema = require('../../schemas/allItemSchema')
 const AllItem = new mongoose.model('AllItem', allItemSchema)
-
+const checkLogin = require ('../../middlewares/checkLogin')
 
 //Get All the Items
-router.get('/',async (req,res)=>{
+router.get('/',checkLogin,async (req,res)=>{
     try{
         const data = await AllItem.find({isStatus: 'active'})
         res.status(200).json({
@@ -19,18 +18,6 @@ router.get('/',async (req,res)=>{
             error:"There was a server side error"
         })
     }
-    // AllItem.find({isStatus: 'active'})
-    //     .exec()
-    //     .then(docs =>{
-    //         console.log(docs)
-    //         res.status(200).json(docs)
-    //     })
-    //     .catch(err=>{
-    //         console.log(err)
-    //         res.status(500).json({
-    //             error: err
-    //         })
-    //     })
 })
 
 //Get A Particular Item by id
@@ -47,17 +34,6 @@ router.get('/:id',async(req,res)=>{
             error:"There was a server side error"
         })
     }
-        // .exec()
-        // .then(docs =>{
-        //     console.log(docs)
-        //     res.status(200).json(docs)
-        // })
-        // .catch(err=>{
-        //     console.log(err)
-        //     res.status(500).json({
-        //         error: err
-        //     })
-        // })
 })
 
 //Post An Item
@@ -89,17 +65,28 @@ router.post("/",async(req,res)=>{
 
 //Post Multiple Item
 router.post('/all',async(req,res)=>{
-    await AllItem.insertMany(req.body,(err)=>{
-        if(err){
-            res.status(500).json({
-                error:"There was Server Side error"
-            })
-        }else{
+    // await AllItem.insertMany(req.body,(err)=>{
+    //     if(err){
+    //         res.status(500).json({
+    //             error:"There was Server Side error"
+    //         })
+    //     }else{
+    //         res.status(200).json({
+    //             message:"All the Items were inserted Successfully"
+    //         })
+    //     }
+    // })
+        try{
+            const data = await AllItem.insertMany(req.body)
             res.status(200).json({
-                message:"All the Items were inserted Successfully"
-            })
-        }
-    })
+                result: data,
+                message:"Success"
+                })
+        }catch(err){
+            res.status(500).json({
+                error:"There was a server side error"
+            })        
+        }            
 })
 
 //Patch An Item
@@ -131,19 +118,19 @@ router.patch('/:id',(req,res)=>{
 })
 
 //Delete An Item
-router.delete('/:id',(req,res)=>{
+router.delete('/:id',async (req,res)=>{
     const id = req.params.id
-    AllItem.deleteOne({id: id})
-        .exec()
-        .then(result =>{
-            res.status(200).json(result)
+    try{
+        const data = await AllItem.deleteOne({id: id})
+        res.status(200).json({
+            result: data,
+            message:"Success"
         })
-        .catch(err =>{
-            console.log(err)
-            res.status(500).json({
-                error: err
-            })
+    }catch(err){
+        res.status(500).json({
+            error:"There was a server side error"
         })
+    }
 })
 
 module.exports = router 
